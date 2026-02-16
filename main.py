@@ -7,13 +7,15 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+# ---------- Career List ----------
 careers = [
-    "Software Developer","Data Scientist","Entrepreneur","Civil Engineer",
-    "Doctor","Digital Marketer","Graphic Designer","Psychologist",
-    "Teacher / Professor","Business Analyst","IAS Officer",
-    "Cyber Security Expert","App Developer","Architect",
-    "Content Creator","Banking Professional","AI Engineer",
-    "Lawyer","Journalist","Fashion Designer"
+    "Software Developer","Data Scientist","Entrepreneur",
+    "Civil Engineer","Doctor","Digital Marketer",
+    "Graphic Designer","Psychologist","Teacher / Professor",
+    "Business Analyst","IAS Officer","Cyber Security Expert",
+    "App Developer","Architect","Content Creator",
+    "Banking Professional","AI Engineer","Lawyer",
+    "Journalist","Fashion Designer"
 ]
 
 lines = [
@@ -24,50 +26,47 @@ lines = [
     "These paths align with your strengths and future success."
 ]
 
+# ---------- Routes ----------
 @app.route("/")
 def home():
     return jsonify({
-        "status": "running",
-        "message": "Career Prediction API is live 🚀"
+        "status":"running",
+        "message":"Career Prediction API is live 🚀",
+        "usage":"POST JSON to /predict"
     })
 
 @app.route("/predict", methods=["GET"])
 def info():
     return jsonify({
-        "message": "Send POST request with name, dob, place",
-        "format": "DD-MM-YYYY"
+        "message":"Send POST request with name, dob, place",
+        "format":"DD-MM-YYYY"
     })
 
 @app.route("/predict", methods=["POST"])
 def predict():
     data = request.get_json()
 
-    if not data:
-        return jsonify({"error": "No JSON received"}), 400
-
     name = data.get("name")
     dob = data.get("dob")
     place = data.get("place")
 
-    if not name or not dob or not place:
-        return jsonify({"error": "Missing fields"}), 400
+    datetime.strptime(dob, "%d-%m-%Y")
 
-    try:
-        datetime.strptime(dob, "%d-%m-%Y")
-    except:
-        return jsonify({"error": "DOB format must be DD-MM-YYYY"}), 400
-
-    random.seed(name + dob + place)
+    random.seed(name + place + dob)
     suggested = random.sample(careers, 5)
 
     return jsonify({
-        "name": name,
-        "place": place,
-        "suggested_careers": suggested,
-        "guidance": random.choice(lines)
+        "name":name,
+        "place":place,
+        "suggested_careers":suggested,
+        "guidance":random.choice(lines)
     })
 
-# ⭐ VERY IMPORTANT PART — THIS STARTS SERVER
+# 🚀 IMPORTANT: This block is ONLY for local testing
+if __name__ == "__main__":
+    app.run(debug=True)
+
 if __name__ == "__main__":
     print("Starting Flask server...")
     app.run(host="0.0.0.0", port=5000, debug=True)
+
